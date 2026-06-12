@@ -1,0 +1,56 @@
+# Reasonix / Codegraph
+.codegraph/
+.reasonix/
+
+# Design docs
+docs/
+
+# Xcode
+*.xcworkspace
+*.xcuserdata
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# XcodeGen (generated project)
+*.xcodeproj
+
+# Swift Package Manager
+.build/
+Package.resolved
+
+# CocoaPods
+Pods/
+
+# Dependencies
+Carthage/
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+
+# iOS
+build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/screenshots/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.vscode/
