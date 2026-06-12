@@ -5,7 +5,6 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  # 手动触发
   workflow_dispatch:
 
 jobs:
@@ -26,46 +25,29 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen
 
-      - name: Archive App
+      - name: Build for Simulator
         run: |
-          xcodebuild clean archive \
+          xcodebuild clean build \
             -project ipaCamera.xcodeproj \
             -scheme ipaCamera \
+            -sdk iphonesimulator \
             -configuration Release \
-            -archivePath ${{ runner.temp }}/ipaCamera.xcarchive \
-            -allowProvisioningUpdates \
-            DEVELOPMENT_TEAM="${{ secrets.TEAM_ID }}" \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.2' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
             | xcbeautify --quiet
 
-      - name: Create ExportOptions.plist
+      - name: Package .app
         run: |
-          cat > ${{ runner.temp }}/ExportOptions.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>development</string>
-              <key>teamID</key>
-              <string>${{ secrets.TEAM_ID }}</string>
-              <key>signingStyle</key>
-              <string>automatic</string>
-          </dict>
-          </plist>
-          EOF
+          mkdir -p ${{ runner.temp }}/ipaCamera
+          find ~/Library/Developer/Xcode/DerivedData -name "ipaCamera.app" -path "*/Release-iphonesimulator/*" -exec cp -R {} ${{ runner.temp }}/ipaCamera/ \;
+          cd ${{ runner.temp }}/ipaCamera
+          zip -r ipaCamera-simulator.zip ipaCamera.app
 
-      - name: Export IPA
-        run: |
-          xcodebuild -exportArchive \
-            -archivePath ${{ runner.temp }}/ipaCamera.xcarchive \
-            -exportPath ${{ runner.temp }}/ipaCamera \
-            -exportOptionsPlist ${{ runner.temp }}/ExportOptions.plist \
-            -allowProvisioningUpdates \
-            | xcbeautify --quiet
-
-      - name: Upload IPA
+      - name: Upload Simulator App
         uses: actions/upload-artifact@v4
         with:
-          name: ipaCamera.ipa
-          path: ${{ runner.temp }}/ipaCamera/*.ipa
-          if-no-files-found: error
+          name: ipaCamera-simulator
+          path: ${{ runner.temp }}/ipaCamera/ipaCamera-simulator.zip
+          if-no-files-found: warn

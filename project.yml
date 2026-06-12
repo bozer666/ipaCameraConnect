@@ -10,7 +10,7 @@ settings:
     SWIFT_VERSION: "5.9"
     TARGETED_DEVICE_FAMILY: "1"  # iPhone only
     INFOPLIST_FILE: ipaCamera/Info.plist
-    DEVELOPMENT_TEAM: ""  # 由 workflow 传入
+    DEVELOPMENT_TEAM: ""  # 打包时通过命令行传入
 
 targets:
   ipaCamera:
