@@ -33,6 +33,7 @@ jobs:
             -sdk iphonesimulator \
             -configuration Release \
             -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.5' \
+            -derivedDataPath ./build \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
@@ -40,14 +41,24 @@ jobs:
 
       - name: Package .app
         run: |
-          mkdir -p ${{ runner.temp }}/ipaCamera
-          find ~/Library/Developer/Xcode/DerivedData -name "ipaCamera.app" -path "*/Release-iphonesimulator/*" -exec cp -R {} ${{ runner.temp }}/ipaCamera/ \;
-          cd ${{ runner.temp }}/ipaCamera
+          APP_PATH="./build/Build/Products/Release-iphonesimulator/ipaCamera.app"
+
+          if [ ! -d "$APP_PATH" ]; then
+            echo "❌ 未找到 .app，实际构建产物目录内容如下："
+            find ./build/Build/Products -maxdepth 3 -type d
+            exit 1
+          fi
+
+          echo "✅ 找到 .app：$APP_PATH"
+          mkdir -p "${{ runner.temp }}/ipaCamera"
+          cp -R "$APP_PATH" "${{ runner.temp }}/ipaCamera/"
+          cd "${{ runner.temp }}/ipaCamera"
           zip -r ipaCamera-simulator.zip ipaCamera.app
+          echo "✅ 打包完成：$(ls -lh ipaCamera-simulator.zip)"
 
       - name: Upload Simulator App
         uses: actions/upload-artifact@v7
         with:
           name: ipaCamera-simulator
           path: ${{ runner.temp }}/ipaCamera/ipaCamera-simulator.zip
-          if-no-files-found: warn
+          if-no-files-found: error
