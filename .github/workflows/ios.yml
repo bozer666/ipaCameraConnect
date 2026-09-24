@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -46,7 +46,7 @@ jobs:
           zip -r ipaCamera-simulator.zip ipaCamera.app
 
       - name: Upload Simulator App
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ipaCamera-simulator
           path: ${{ runner.temp }}/ipaCamera/ipaCamera-simulator.zip
