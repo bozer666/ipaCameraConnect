@@ -25,6 +25,14 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen
 
+      - name: Inspect Assets
+        run: |
+          echo "=== Assets.xcassets 目录结构 ==="
+          find ipaCamera/Resources/Assets.xcassets -maxdepth 3 -print 2>/dev/null || echo "目录不存在"
+          echo ""
+          echo "=== 查找所有 Contents.json ==="
+          find ipaCamera -name "Contents.json" -path "*Assets.xcassets*" -exec echo "--- {} ---" \; -exec cat {} \;
+          
       - name: Build for Simulator
         run: |
           xcodebuild clean build \
